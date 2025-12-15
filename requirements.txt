@@ -5,3 +5,4 @@ pymysql==1.1.0
 python-dotenv==1.0.0
 Flask-CORS==4.0.0
 cryptography==41.0.7
+Flask-Bcrypt==1.0.1

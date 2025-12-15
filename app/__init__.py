@@ -15,6 +15,9 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     """flask db migrate, flask db upgrade"""
+
+    with app.app_context():
+        from app import models
     
  
     from app.blueprints.parent import parent_bp
