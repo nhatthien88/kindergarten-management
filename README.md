@@ -23,3 +23,7 @@ flask db init
 
 6. tao migration file
 flask db migrate -m "tao database schema voi 11 model"
+
+flask db upgrade
+
+Luu y: KHONG XOA TABLE ALEMBIC_VERSION
