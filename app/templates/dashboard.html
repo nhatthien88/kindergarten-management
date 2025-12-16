@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Kindergarten Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard">
+        <header class="dashboard-header">
+            <h1>🏫 Kindergarten Management</h1>
+            <div class="user-info">
+                <span id="userName">Loading...</span>
+                <button id="logoutBtn" class="btn btn-secondary">Đăng xuất</button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="welcome-card">
+                <h2>Chào mừng! 👋</h2>
+                <div id="userDetails">
+                    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+                    <p><strong>Vai trò:</strong> <span id="userRole"></span></p>
+                    <p><strong>Số điện thoại:</strong> <span id="userPhone"></span></p>
+                    <p><strong>Trạng thái:</strong> <span id="userStatus"></span></p>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>📊 Thống kê</h3>
+                    <p>Xem các thống kê và báo cáo</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>👥 Quản lý người dùng</h3>
+                    <p>Quản lý tài khoản và phân quyền</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🎓 Quản lý học sinh</h3>
+                    <p>Thông tin học sinh và lớp học</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>💰 Quản lý học phí</h3>
+                    <p>Thanh toán và hóa đơn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

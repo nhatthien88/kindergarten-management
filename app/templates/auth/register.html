@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Đăng ký - Kindergarten Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-box">
+        <h1>🏫 Kindergarten Management</h1>
+        <h2>Đăng ký tài khoản</h2>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <input type="password" id="password" name="password" required placeholder="Tối thiểu 6 ký tự"
+                    minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label for="full_name">Họ và tên:</label>
+                <input type="text" id="full_name" name="full_name" required placeholder="Nguyễn Văn A">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Số điện thoại:</label>
+                <input type="tel" id="phone" name="phone" placeholder="0123456789">
+            </div>
+
+            <div class="form-group">
+                <label for="role">Vai trò: </label>
+                <select id="role" name="role" required>
+                    <option value="">-- Chọn vai trò --</option>
+                    <option value="parent">Phụ huynh</option>
+                    <option value="teacher">Giáo viên</option>
+                </select>
+            </div>
+
+            <div id="parentFields" style="display:  none;">
+                <div class="form-group">
+                    <label for="address">Địa chỉ:</label>
+                    <input type="text" id="address" name="address" placeholder="123 Đường ABC, Hà Nội">
+                </div>
+
+                <div class="form-group">
+                    <label for="relationship">Quan hệ:</label>
+                    <select id="relationship" name="relationship">
+                        <option value="Bố">Bố</option>
+                        <option value="Mẹ">Mẹ</option>
+                        <option value="Ông">Ông</option>
+                        <option value="Bà">Bà</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="teacherFields" style="display: none;">
+                <div class="form-group">
+                    <label for="employee_id">Mã giáo viên:</label>
+                    <input type="text" id="employee_id" name="employee_id" placeholder="GV001">
+                </div>
+
+                <div class="form-group">
+                    <label for="qualification">Trình độ:</label>
+                    <input type="text" id="qualification" name="qualification" placeholder="Cử nhân sư phạm">
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <button type="submit" class="btn btn-primary">Đăng ký</button>
+        </form>
+
+        <p class="switch-auth">
+            Đã có tài khoản? <a href="{{ url_for('auth.login_page') }}">Đăng nhập</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+{% endblock %}

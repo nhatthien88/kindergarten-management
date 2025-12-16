@@ -14,8 +14,15 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    SQLALCHEMY_ECHO = True  # Show SQL queries in console
+    SQLALCHEMY_DATABASE_URI = (
+        f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
+    SQLALCHEMY_ECHO = True 
+
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'dev-secret-key-change-in-production')
+    JWT_ACCESS_TOKEN_EXPIRES = 86400 
+    JWT_REFRESH_TOKEN_EXPIRES = 2592000
 
 class ProductionConfig(Config):
     DEBUG = False

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Đăng nhập - Kindergarten Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-box">
+        <h1>🏫 Kindergarten Management</h1>
+        <h2>Đăng nhập</h2>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="admin@kindergarten.com"
+                    value="{{ email or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+        </form>
+
+        <p class="switch-auth">
+            Chưa có tài khoản? <a href="{{ url_for('auth.register_page') }}">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}
