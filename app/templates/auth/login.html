@@ -1,37 +1,171 @@
-{% extends "base.html" %}
+<!-- app/templates/auth/login.html -->
+<!DOCTYPE html>
+<html lang="vi">
 
-{% block title %}Đăng nhập - Kindergarten Management{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Kindergarten Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block content %}
-<div class="container">
-    <div class="auth-box">
-        <h1>🏫 Kindergarten Management</h1>
-        <h2>Đăng nhập</h2>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-        <form id="loginForm">
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .switch-auth a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🏫 Kindergarten</h1>
+            <p>Hệ thống quản lý trường mầm non</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.login_submit') }}" method="POST">
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required placeholder="admin@kindergarten.com"
-                    value="{{ email or '' }}">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="admin@kindergarten.com">
             </div>
 
             <div class="form-group">
-                <label for="password">Mật khẩu:</label>
+                <label for="password">Mật khẩu</label>
                 <input type="password" id="password" name="password" required placeholder="••••••••">
             </div>
 
-            <div id="errorMessage" class="error-message"></div>
-
-            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+            <button type="submit" class="btn-login">Đăng nhập</button>
         </form>
 
         <p class="switch-auth">
             Chưa có tài khoản? <a href="{{ url_for('auth.register_page') }}">Đăng ký ngay</a>
         </p>
     </div>
-</div>
-{% endblock %}
+</body>
 
-{% block extra_js %}
-<script src="{{ url_for('static', filename='js/login.js') }}"></script>
-{% endblock %}
+</html>

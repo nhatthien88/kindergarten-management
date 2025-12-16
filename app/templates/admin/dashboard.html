@@ -1,0 +1,74 @@
+<!-- app/templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Kindergarten Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard">
+        <header class="dashboard-header">
+            <h1>🏫 Kindergarten Management</h1>
+            <div class="user-info">
+                <span id="userName">{{ user.full_name }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary"
+                    onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+                    Đăng xuất
+                </a>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="welcome-card">
+                <h2>Chào mừng! 👋</h2>
+                <div id="userDetails">
+                    <p><strong>Email:</strong> <span id="userEmail">{{ user.email }}</span></p>
+                    <p><strong>Vai trò:</strong> <span id="userRole">
+                            {% if user.role.value == 'admin' %}
+                            Quản trị viên
+                            {% elif user.role.value == 'teacher' %}
+                            Giáo viên
+                            {% elif user.role. value == 'parent' %}
+                            Phụ huynh
+                            {% else %}
+                            {{ user.role.value }}
+                            {% endif %}
+                        </span></p>
+                    <p><strong>Số điện thoại:</strong> <span id="userPhone">{{ user.phone or 'Chưa cập nhật' }}</span>
+                    </p>
+                    <p><strong>Trạng thái:</strong>
+                        <span id="userStatus" class="status-{% if user.is_active %}active{% else %}inactive{% endif %}">
+                            {% if user.is_active %}
+                            ✅ Đang hoạt động
+                            {% else %}
+                            ❌ Không hoạt động
+                            {% endif %}
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>📊 Thống kê</h3>
+                    <p>Xem các thống kê và báo cáo</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>👥 Quản lý người dùng</h3>
+                    <p>Quản lý tài khoản và phân quyền</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🎓 Quản lý học sinh</h3>
+                    <p>Thông tin học sinh và lớp học</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>💰 Quản lý học phí</h3>
+                    <p>Thanh toán và hóa đơn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

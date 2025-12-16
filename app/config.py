@@ -1,5 +1,6 @@
 
 import os 
+from datetime import timedelta
 from dotenv import load_dotenv
 """os: de doc bien moi truong"""
 """dotenv: de load file .env"""
@@ -11,6 +12,14 @@ class Config:
     """tat di de toi uu hieu suat"""
     SQLALCHEMY_ECHO = False
     """TRUE IF Debugging"""
+
+    SESSION_TYPE = 'filesystem' 
+    SESSION_PERMANENT = True
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7) 
+    SESSION_COOKIE_SECURE = False 
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_NAME = 'kindergarten_session'
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -27,6 +36,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+
+    SESSION_COOKIE_SECURE = True 
 
 config = {
     'development': DevelopmentConfig,

@@ -1,3 +1,4 @@
+<!-- app/templates/auth/register.html -->
 {% extends "base.html" %}
 
 {% block title %}Đăng ký - Kindergarten Management{% endblock %}
@@ -8,45 +9,58 @@
         <h1>🏫 Kindergarten Management</h1>
         <h2>Đăng ký tài khoản</h2>
 
-        <form id="registerForm">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="margin-bottom: 20px;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.register_submit') }}" method="POST">
             <div class="form-group">
-                <label for="email">Email:</label>
+                <label for="email">Email</label>
                 <input type="email" id="email" name="email" required placeholder="your@email.com">
             </div>
 
             <div class="form-group">
-                <label for="password">Mật khẩu:</label>
+                <label for="password">Mật khẩu</label>
                 <input type="password" id="password" name="password" required placeholder="Tối thiểu 6 ký tự"
                     minlength="6">
             </div>
 
             <div class="form-group">
-                <label for="full_name">Họ và tên:</label>
+                <label for="full_name">Họ và tên</label>
                 <input type="text" id="full_name" name="full_name" required placeholder="Nguyễn Văn A">
             </div>
 
             <div class="form-group">
-                <label for="phone">Số điện thoại:</label>
+                <label for="phone">Số điện thoại</label>
                 <input type="tel" id="phone" name="phone" placeholder="0123456789">
             </div>
 
             <div class="form-group">
-                <label for="role">Vai trò: </label>
-                <select id="role" name="role" required>
+                <label for="role">Vai trò</label>
+                <select id="role" name="role" required onchange="toggleRoleFields()">
                     <option value="">-- Chọn vai trò --</option>
                     <option value="parent">Phụ huynh</option>
                     <option value="teacher">Giáo viên</option>
                 </select>
             </div>
 
-            <div id="parentFields" style="display:  none;">
+            <!-- Parent Fields -->
+            <div id="parentFields" style="display: none;">
                 <div class="form-group">
-                    <label for="address">Địa chỉ:</label>
+                    <label for="address">Địa chỉ</label>
                     <input type="text" id="address" name="address" placeholder="123 Đường ABC, Hà Nội">
                 </div>
 
                 <div class="form-group">
-                    <label for="relationship">Quan hệ:</label>
+                    <label for="relationship">Quan hệ</label>
                     <select id="relationship" name="relationship">
                         <option value="Bố">Bố</option>
                         <option value="Mẹ">Mẹ</option>
@@ -57,20 +71,18 @@
                 </div>
             </div>
 
+            <!-- Teacher Fields -->
             <div id="teacherFields" style="display: none;">
                 <div class="form-group">
-                    <label for="employee_id">Mã giáo viên:</label>
+                    <label for="employee_id">Mã giáo viên</label>
                     <input type="text" id="employee_id" name="employee_id" placeholder="GV001">
                 </div>
 
                 <div class="form-group">
-                    <label for="qualification">Trình độ:</label>
+                    <label for="qualification">Trình độ</label>
                     <input type="text" id="qualification" name="qualification" placeholder="Cử nhân sư phạm">
                 </div>
             </div>
-
-            <div id="errorMessage" class="error-message"></div>
-            <div id="successMessage" class="success-message"></div>
 
             <button type="submit" class="btn btn-primary">Đăng ký</button>
         </form>
@@ -83,5 +95,22 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+<script>
+    function toggleRoleFields() {
+        const role = document.getElementById('role').value;
+        const parentFields = document.getElementById('parentFields');
+        const teacherFields = document.getElementById('teacherFields');
+
+        if (role === 'parent') {
+            parentFields.style.display = 'block';
+            teacherFields.style.display = 'none';
+        } else if (role === 'teacher') {
+            parentFields.style.display = 'none';
+            teacherFields.style.display = 'block';
+        } else {
+            parentFields.style.display = 'none';
+            teacherFields.style.display = 'none';
+        }
+    }
+</script>
 {% endblock %}

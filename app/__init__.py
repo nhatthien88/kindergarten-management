@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from app.config import config
 from app.extensions import db, migrate, jwt
+from flask_session import Session 
 
 
 def create_app(config_name='development'):
@@ -14,6 +15,8 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+
+    Session(app) 
 
     CORS(app, resources={
         r"/api/*": {
