@@ -1,0 +1,110 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Quản lý Học phí{% endblock %}
+{% block page_title %}💰 Quản lý Học phí{% endblock %}
+
+{% block content %}
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <form method="GET" action="{{ url_for('admin.list_fees') }}">
+        <div class="filter-group">
+            <div class="filter-item">
+                <label>Tháng</label>
+                <input type="number" class="form-control" name="month" min="1" max="12" 
+                       value="{{ filters.get('month', '') }}" placeholder="1-12">
+            </div>
+            <div class="filter-item">
+                <label>Năm</label>
+                <input type="number" class="form-control" name="year" 
+                       value="{{ filters.get('year', '') }}" placeholder="2024">
+            </div>
+            <div class="filter-item">
+                <label>Trạng thái</label>
+                <select name="status" class="form-control">
+                    <option value="">Tất cả</option>
+                    <option value="pending" {% if filters.get('status') == 'pending' %}selected{% endif %}>Chờ thanh toán</option>
+                    <option value="paid" {% if filters.get('status') == 'paid' %}selected{% endif %}>Đã thanh toán</option>
+                    <option value="partial" {% if filters.get('status') == 'partial' %}selected{% endif %}>Thanh toán 1 phần</option>
+                    <option value="overdue" {% if filters.get('status') == 'overdue' %}selected{% endif %}>Quá hạn</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Lớp học</label>
+                <select name="classroom_id" class="form-control">
+                    <option value="">Tất cả</option>
+                    {% for classroom in classrooms %}
+                    <option value="{{ classroom.id }}" {% if filters.get('classroom_id') == classroom.id %}selected{% endif %}>
+                        {{ classroom.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                <a href="{{ url_for('admin.list_fees') }}" class="btn btn-secondary">Xóa lọc</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('admin.generate_fees_form') }}" class="btn btn-success">➕ Tạo học phí tháng mới</a>
+</div>
+
+<!-- Fees Table -->
+<div class="table-container">
+    <h3>Danh sách học phí ({{ fees|length }})</h3>
+    
+    {% if fees %}
+    <table>
+        <thead>
+            <tr>
+                <th>Tháng/Năm</th>
+                <th>Học sinh</th>
+                <th>Lớp</th>
+                <th>Tổng phí</th>
+                <th>Đã thanh toán</th>
+                <th>Còn lại</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fee in fees %}
+            <tr>
+                <td>{{ fee.month }}/{{ fee.year }}</td>
+                <td>{{ fee.student.full_name }}</td>
+                <td>{{ fee.student.classroom.name if fee.student.classroom else '-' }}</td>
+                <td>{{ "{:,.0f}".format(fee.total_fee) }}đ</td>
+                <td>{{ "{:,.0f}".format(fee.paid_amount) }}đ</td>
+                <td>{{ "{:,.0f}".format(fee.remaining_amount) }}đ</td>
+                <td>
+                    {% if fee.status.value == 'paid' %}
+                        <span class="badge badge-success">Đã thanh toán</span>
+                    {% elif fee.status.value == 'pending' %}
+                        <span class="badge badge-warning">Chờ thanh toán</span>
+                    {% elif fee.status.value == 'overdue' %}
+                        <span class="badge badge-danger">Quá hạn</span>
+                    {% elif fee.status.value == 'partial' %}
+                        <span class="badge badge-info">Thanh toán 1 phần</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('admin.fee_detail', fee_id=fee.id) }}" class="btn btn-sm btn-primary">Chi tiết</a>
+                    {% if fee.remaining_amount > 0 %}
+                    <a href="{{ url_for('admin.payment_form', fee_id=fee.id) }}" class="btn btn-sm btn-success">Thanh toán</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">💰</div>
+        <div class="empty-state-message">Chưa có học phí nào</div>
+        <a href="{{ url_for('admin.generate_fees_form') }}" class="btn btn-primary" style="margin-top: 20px;">➕ Tạo học phí</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Thống kê Học sinh{% endblock %}
+{% block page_title %}📊 Thống kê Học sinh (YC4){% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <form method="GET" action="{{ url_for('admin.student_report') }}">
+        <div class="filter-group">
+            <div class="filter-item">
+                <label>Năm học</label>
+                <select name="school_year" class="form-control">
+                    <option value="">Tất cả</option>
+                    {% for year in school_years %}
+                    <option value="{{ year }}" {% if current_year == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                <a href="{{ url_for('admin.student_report') }}" class="btn btn-secondary">Xóa lọc</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Statistics by Classroom -->
+<div class="table-container">
+    <h3>📚 Số học sinh từng lớp</h3>
+    {% if stats.by_classroom %}
+    <table>
+        <thead>
+            <tr>
+                <th>Lớp học</th>
+                <th>Số học sinh</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classroom, count in stats.by_classroom.items() %}
+            <tr>
+                <td>{{ classroom }}</td>
+                <td><strong>{{ count }}</strong> học sinh</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="font-weight: bold; background: #ecf0f1;">
+                <td>Tổng cộng</td>
+                <td>{{ stats.by_classroom.values() | sum }} học sinh</td>
+            </tr>
+        </tfoot>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">👶</div>
+        <div class="empty-state-message">Chưa có dữ liệu</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Gender Distribution Chart (YC4) -->
+<div class="chart-container" style="max-width: 600px; margin: 30px auto;">
+    <h3>👦👧 Tỷ lệ giới tính (YC4 - Pie Chart)</h3>
+    <canvas id="genderPieChart"></canvas>
+</div>
+
+<script>
+// Gender Distribution Pie Chart (YC4)
+const genderData = {{ stats.by_gender | tojson }};
+const genderLabels = Object.keys(genderData);
+const genderValues = Object.values(genderData);
+
+new Chart(document.getElementById('genderPieChart'), {
+    type: 'pie',
+    data: {
+        labels: genderLabels,
+        datasets: [{
+            label: 'Số học sinh',
+            data: genderValues,
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 99, 132, 0.5)'
+            ],
+            borderColor: [
+                'rgb(54, 162, 235)',
+                'rgb(255, 99, 132)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' },
+            title: {
+                display: true,
+                text: 'Phân bố giới tính học sinh'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

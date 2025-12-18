@@ -1,0 +1,74 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Chi tiết Lớp học{% endblock %}
+{% block page_title %}🏫 Chi tiết Lớp học{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h3>{{ classroom.name }}</h3>
+    
+    <table style="width: 100%; margin-bottom: 20px;">
+        <tr>
+            <th>Năm học:</th>
+            <td>{{ classroom.school_year }}</td>
+        </tr>
+        <tr>
+            <th>Giáo viên chủ nhiệm:</th>
+            <td>{{ teacher.user.full_name if teacher else 'Chưa phân công' }}</td>
+        </tr>
+        <tr>
+            <th>Sức chứa:</th>
+            <td>{{ classroom.current_student_count }}/{{ classroom.capacity }}
+                {% if classroom.is_full %}
+                    <span class="badge badge-danger">Đã đầy</span>
+                {% else %}
+                    <span class="badge badge-success">Còn {{ classroom.capacity - classroom.current_student_count }} chỗ</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Phòng học:</th>
+            <td>{{ classroom.room_number or '-' }}</td>
+        </tr>
+    </table>
+
+    <div class="action-buttons" style="margin-bottom: 30px;">
+        <a href="{{ url_for('admin.edit_classroom_form', classroom_id=classroom.id) }}" class="btn btn-warning">✏️ Sửa thông tin</a>
+        {% if classroom.current_student_count == 0 %}
+        <form method="POST" action="{{ url_for('admin.delete_classroom', classroom_id=classroom.id) }}" style="display: inline;" id="deleteForm">
+            <button type="button" onclick="confirmDelete('deleteForm', 'Bạn có chắc muốn xóa lớp học này?')" class="btn btn-danger">🗑️ Xóa lớp</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('admin.list_classrooms') }}" class="btn btn-secondary">← Quay lại</a>
+    </div>
+
+    <h4>Danh sách học sinh ({{ students|length }})</h4>
+    {% if students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Họ tên</th>
+                <th>Ngày sinh</th>
+                <th>Giới tính</th>
+                <th>Phụ huynh</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.full_name }}</td>
+                <td>{{ student.date_of_birth.strftime('%d/%m/%Y') }}</td>
+                <td>{{ student.gender }}</td>
+                <td>{{ student.parent.user.full_name if student.parent else '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">👶</div>
+        <div class="empty-state-message">Chưa có học sinh nào trong lớp</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
