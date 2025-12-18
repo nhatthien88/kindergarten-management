@@ -1,6 +1,6 @@
 # app/blueprints/teacher/routes.py
 from flask import render_template, redirect, url_for, flash, session
-from app.blueprints.teacher import teacher_bp
+from . import teacher_bp
 from app.models import User
 from app.extensions import db
 

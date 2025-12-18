@@ -1,6 +1,6 @@
 # app/blueprints/parent/routes.py
 from flask import render_template, redirect, url_for, flash, session
-from app.blueprints.parent import parent_bp
+from . import parent_bp
 from app.models import User
 from app.extensions import db
 

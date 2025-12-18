@@ -1,6 +1,6 @@
 # app/blueprints/admin/routes.py
 from flask import render_template, redirect, url_for, flash, session
-from app.blueprints.admin import admin_bp
+from . import admin_bp
 from app.blueprints.admin.decorators import admin_required
 from app.models import User, UserRole
 from app.extensions import db
