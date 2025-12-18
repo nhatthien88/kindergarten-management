@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Cấu hình Hệ thống{% endblock %}
+{% block page_title %}⚙️ Cấu hình Hệ thống{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <form method="POST" action="{{ url_for('admin.update_settings') }}">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button type="button" class="tab active" data-target="fee-settings">Học phí</button>
+            <button type="button" class="tab" data-target="classroom-settings">Lớp học</button>
+            <button type="button" class="tab" data-target="school-info">Thông tin trường</button>
+        </div>
+
+        <!-- Tab Content 1: Fee Settings -->
+        <div id="fee-settings" class="tab-content active">
+            <h3>Cài đặt học phí</h3>
+            <div class="form-group">
+                <label for="tuition_fee_monthly">Học phí hàng tháng (VND) <span style="color: red;">*</span></label>
+                <input type="number" class="form-control" id="tuition_fee_monthly" name="tuition_fee_monthly" 
+                       value="{{ settings.get('tuition_fee_monthly', 1500000) }}" required>
+                <small>Mức học phí cơ bản hàng tháng (YC3: 1,500,000 VND)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="meal_price_daily">Giá tiền ăn mỗi ngày (VND) <span style="color: red;">*</span></label>
+                <input type="number" class="form-control" id="meal_price_daily" name="meal_price_daily" 
+                       value="{{ settings.get('meal_price_daily', 25000) }}" required>
+                <small>Giá tiền ăn cho mỗi ngày (YC3: 25,000 VND)</small>
+            </div>
+        </div>
+
+        <!-- Tab Content 2: Classroom Settings -->
+        <div id="classroom-settings" class="tab-content">
+            <h3>Cài đặt lớp học</h3>
+            <div class="form-group">
+                <label for="default_classroom_capacity">Sức chứa mặc định của lớp học <span style="color: red;">*</span></label>
+                <input type="number" class="form-control" id="default_classroom_capacity" 
+                       name="default_classroom_capacity" 
+                       value="{{ settings.get('default_classroom_capacity', 25) }}" required>
+                <small>Số học sinh tối đa trong một lớp (YC5)</small>
+            </div>
+        </div>
+
+        <!-- Tab Content 3: School Info -->
+        <div id="school-info" class="tab-content">
+            <h3>Thông tin trường</h3>
+            <div class="form-group">
+                <label for="school_name">Tên trường <span style="color: red;">*</span></label>
+                <input type="text" class="form-control" id="school_name" name="school_name" 
+                       value="{{ settings.get('school_name', 'Trường Mầm Non ABC') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="school_address">Địa chỉ</label>
+                <textarea class="form-control" id="school_address" name="school_address">{{ settings.get('school_address', '') }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="school_phone">Số điện thoại</label>
+                <input type="text" class="form-control" id="school_phone" name="school_phone" 
+                       value="{{ settings.get('school_phone', '') }}">
+            </div>
+
+            <div class="form-group">
+                <label for="school_email">Email</label>
+                <input type="email" class="form-control" id="school_email" name="school_email" 
+                       value="{{ settings.get('school_email', '') }}">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group" style="margin-top: 30px;">
+            <button type="submit" class="btn btn-primary">💾 Lưu cài đặt</button>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

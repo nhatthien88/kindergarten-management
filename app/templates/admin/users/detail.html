@@ -1,0 +1,115 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Chi tiết User{% endblock %}
+{% block page_title %}👤 Chi tiết User{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h3>{{ target_user.full_name }}</h3>
+    
+    <table style="width: 100%; margin-bottom: 20px;">
+        <tr>
+            <th>Email:</th>
+            <td>{{ target_user.email }}</td>
+        </tr>
+        <tr>
+            <th>Vai trò:</th>
+            <td>
+                {% if target_user.role.value == 'teacher' %}
+                    <span class="badge badge-info">Giáo viên</span>
+                {% elif target_user.role.value == 'parent' %}
+                    <span class="badge badge-success">Phụ huynh</span>
+                {% elif target_user.role.value == 'admin' %}
+                    <span class="badge badge-danger">Admin</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Điện thoại:</th>
+            <td>{{ target_user.phone or '-' }}</td>
+        </tr>
+        <tr>
+            <th>Trạng thái:</th>
+            <td>
+                {% if target_user.is_active %}
+                    <span class="badge badge-success">✅ Hoạt động</span>
+                {% else %}
+                    <span class="badge badge-danger">❌ Không hoạt động</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Ngày tạo:</th>
+            <td>{{ target_user.created_at.strftime('%d/%m/%Y %H:%M') if target_user.created_at else '-' }}</td>
+        </tr>
+    </table>
+
+    {% if profile %}
+    <h4>Thông tin chi tiết</h4>
+    <table style="width: 100%; margin-bottom: 20px;">
+        {% if target_user.role.value == 'teacher' %}
+        <tr>
+            <th>Mã nhân viên:</th>
+            <td>{{ profile.employee_id or '-' }}</td>
+        </tr>
+        <tr>
+            <th>Trình độ:</th>
+            <td>{{ profile.qualification or '-' }}</td>
+        </tr>
+        <tr>
+            <th>Chuyên môn:</th>
+            <td>{{ profile.specialization or '-' }}</td>
+        </tr>
+        <tr>
+            <th>Số lớp đang dạy:</th>
+            <td>{{ stats.get('classrooms', 0) }}</td>
+        </tr>
+        {% elif target_user.role.value == 'parent' %}
+        <tr>
+            <th>Địa chỉ:</th>
+            <td>{{ profile.address or '-' }}</td>
+        </tr>
+        <tr>
+            <th>SĐT khẩn cấp:</th>
+            <td>{{ profile.emergency_contact or '-' }}</td>
+        </tr>
+        <tr>
+            <th>Quan hệ:</th>
+            <td>{{ profile.relationship or '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nghề nghiệp:</th>
+            <td>{{ profile.occupation or '-' }}</td>
+        </tr>
+        <tr>
+            <th>Số con:</th>
+            <td>{{ stats.get('students', 0) }}</td>
+        </tr>
+        {% endif %}
+    </table>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        {% if target_user.role.value == 'teacher' and not target_user.is_active %}
+        <button onclick="approveTeacher({{ target_user.id }}, this)" class="btn btn-success">
+            ✅ Duyệt giáo viên
+        </button>
+        {% endif %}
+        
+        {% if target_user.role.value != 'admin' %}
+        <button onclick="toggleUserStatus({{ target_user.id }}, this)" 
+                data-status="{{ target_user.is_active|lower }}"
+                class="btn {% if target_user.is_active %}btn-warning{% else %}btn-success{% endif %}">
+            {% if target_user.is_active %}
+                🔒 Vô hiệu hóa
+            {% else %}
+                🔓 Kích hoạt
+            {% endif %}
+        </button>
+        {% endif %}
+        
+        <a href="{{ url_for('admin.list_users') }}" class="btn btn-secondary">← Quay lại</a>
+    </div>
+</div>
+{% endblock %}

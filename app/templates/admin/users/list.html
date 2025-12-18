@@ -1,0 +1,109 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Quản lý Users{% endblock %}
+{% block page_title %}👥 Quản lý Users{% endblock %}
+
+{% block content %}
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <form method="GET" action="{{ url_for('admin.list_users') }}">
+        <div class="filter-group">
+            <div class="filter-item">
+                <label>Vai trò</label>
+                <select name="role" class="form-control">
+                    <option value="">Tất cả</option>
+                    <option value="teacher" {% if current_role == 'teacher' %}selected{% endif %}>Giáo viên</option>
+                    <option value="parent" {% if current_role == 'parent' %}selected{% endif %}>Phụ huynh</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Trạng thái</label>
+                <select name="status" class="form-control">
+                    <option value="">Tất cả</option>
+                    <option value="active" {% if current_status == 'active' %}selected{% endif %}>Đang hoạt động</option>
+                    <option value="inactive" {% if current_status == 'inactive' %}selected{% endif %}>Không hoạt động</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                <a href="{{ url_for('admin.list_users') }}" class="btn btn-secondary">Xóa lọc</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if pending_count > 0 %}
+<div class="alert alert-warning">
+    ⚠️ Có <strong>{{ pending_count }}</strong> giáo viên chờ duyệt!
+</div>
+{% endif %}
+
+<!-- Users Table -->
+<div class="table-container">
+    <h3>Danh sách người dùng ({{ users|length }})</h3>
+    
+    {% if users %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Điện thoại</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.full_name }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                    {% if u.role.value == 'teacher' %}
+                        <span class="badge badge-info">Giáo viên</span>
+                    {% elif u.role.value == 'parent' %}
+                        <span class="badge badge-success">Phụ huynh</span>
+                    {% else %}
+                        <span class="badge badge-secondary">{{ u.role.value }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ u.phone or '-' }}</td>
+                <td>
+                    {% if u.role.value == 'teacher' %}
+                        {% if u.is_active %}
+                            <span class="badge badge-success">✅ Đã duyệt</span>
+                        {% else %}
+                            <span class="badge badge-warning">⏳ Chờ duyệt</span>
+                        {% endif %}
+                    {% elif u.role.value == 'parent' %}
+                        {% if u.parent_profile and u.parent_profile.students.count() > 0 %}
+                            <span class="badge badge-success">✅ Có {{ u.parent_profile.students.count() }} con</span>
+                        {% else %}
+                            <span class="badge badge-warning">⚠️ Chưa liên kết</span>
+                        {% endif %}
+                    {% else %}
+                        {% if u.is_active %}
+                            <span class="badge badge-success">✅ Hoạt động</span>
+                        {% else %}
+                            <span class="badge badge-danger">❌ Vô hiệu</span>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="btn btn-sm btn-primary">Chi tiết</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">👤</div>
+        <div class="empty-state-message">Không có người dùng nào</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
