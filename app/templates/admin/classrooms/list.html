@@ -1,0 +1,60 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Quản lý Lớp học{% endblock %}
+{% block page_title %}🏫 Quản lý Lớp học{% endblock %}
+
+{% block content %}
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <form method="GET" action="{{ url_for('admin.list_classrooms') }}">
+        <div class="filter-group">
+            <div class="filter-item">
+                <label>Năm học</label>
+                <select name="school_year" class="form-control">
+                    <option value="">Tất cả</option>
+                    {% for year in school_years %}
+                    <option value="{{ year }}" {% if current_year == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                <a href="{{ url_for('admin.list_classrooms') }}" class="btn btn-secondary">Xóa lọc</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('admin.add_classroom_form') }}" class="btn btn-success">➕ Thêm lớp học</a>
+</div>
+
+<!-- Classrooms Grid -->
+<div class="metrics-grid">
+    {% for classroom in classrooms %}
+    <div class="metric-card">
+        <h3>{{ classroom.name }}</h3>
+        <p><strong>Năm học:</strong> {{ classroom.school_year }}</p>
+        <p><strong>Giáo viên:</strong> {{ classroom.teacher.user.full_name if classroom.teacher else 'Chưa phân công' }}</p>
+        <p><strong>Học sinh:</strong> {{ classroom.current_student_count }}/{{ classroom.capacity }}
+            {% if classroom.is_full %}
+                <span class="badge badge-danger">Đã đầy</span>
+            {% endif %}
+        </p>
+        <p><strong>Phòng:</strong> {{ classroom.room_number or '-' }}</p>
+        <div class="action-buttons" style="margin-top: 15px;">
+            <a href="{{ url_for('admin.classroom_detail', classroom_id=classroom.id) }}" class="btn btn-sm btn-primary">Chi tiết</a>
+            <a href="{{ url_for('admin.edit_classroom_form', classroom_id=classroom.id) }}" class="btn btn-sm btn-warning">Sửa</a>
+        </div>
+    </div>
+    {% endfor %}
+    
+    {% if not classrooms %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+        <div class="empty-state-icon">🏫</div>
+        <div class="empty-state-message">Chưa có lớp học nào</div>
+        <a href="{{ url_for('admin.add_classroom_form') }}" class="btn btn-primary" style="margin-top: 20px;">➕ Thêm lớp học</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

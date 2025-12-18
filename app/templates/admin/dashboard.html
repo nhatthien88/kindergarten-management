@@ -1,74 +1,88 @@
-<!-- app/templates/dashboard.html -->
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
-{% block title %}Dashboard - Kindergarten Management{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}📊 Dashboard{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="dashboard">
-        <header class="dashboard-header">
-            <h1>🏫 Kindergarten Management</h1>
-            <div class="user-info">
-                <span id="userName">{{ user.full_name }}</span>
-                <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary"
-                    onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
-                    Đăng xuất
-                </a>
-            </div>
-        </header>
-
-        <div class="dashboard-content">
-            <div class="welcome-card">
-                <h2>Chào mừng! 👋</h2>
-                <div id="userDetails">
-                    <p><strong>Email:</strong> <span id="userEmail">{{ user.email }}</span></p>
-                    <p><strong>Vai trò:</strong> <span id="userRole">
-                            {% if user.role.value == 'admin' %}
-                            Quản trị viên
-                            {% elif user.role.value == 'teacher' %}
-                            Giáo viên
-                            {% elif user.role. value == 'parent' %}
-                            Phụ huynh
-                            {% else %}
-                            {{ user.role.value }}
-                            {% endif %}
-                        </span></p>
-                    <p><strong>Số điện thoại:</strong> <span id="userPhone">{{ user.phone or 'Chưa cập nhật' }}</span>
-                    </p>
-                    <p><strong>Trạng thái:</strong>
-                        <span id="userStatus" class="status-{% if user.is_active %}active{% else %}inactive{% endif %}">
-                            {% if user.is_active %}
-                            ✅ Đang hoạt động
-                            {% else %}
-                            ❌ Không hoạt động
-                            {% endif %}
-                        </span>
-                    </p>
-                </div>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h3>📊 Thống kê</h3>
-                    <p>Xem các thống kê và báo cáo</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>👥 Quản lý người dùng</h3>
-                    <p>Quản lý tài khoản và phân quyền</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>🎓 Quản lý học sinh</h3>
-                    <p>Thông tin học sinh và lớp học</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>💰 Quản lý học phí</h3>
-                    <p>Thanh toán và hóa đơn</p>
-                </div>
-            </div>
-        </div>
+<!-- Metrics Grid -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-icon">👶</div>
+        <div class="metric-value">{{ stats.total_students }}</div>
+        <div class="metric-label">Tổng số học sinh</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon">👨‍🏫</div>
+        <div class="metric-value">{{ stats.total_teachers }}</div>
+        <div class="metric-label">Tổng số giáo viên</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon">👨‍👩‍👧</div>
+        <div class="metric-value">{{ stats.total_parents }}</div>
+        <div class="metric-label">Tổng số phụ huynh</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon">💰</div>
+        <div class="metric-value">{{ "{:,.0f}".format(stats.revenue_this_month) }}đ</div>
+        <div class="metric-label">Doanh thu tháng này</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon">⏳</div>
+        <div class="metric-value">{{ stats.pending_fees }}</div>
+        <div class="metric-label">Học phí chờ thanh toán</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon">⚠️</div>
+        <div class="metric-value">{{ stats.overdue_fees }}</div>
+        <div class="metric-label">Học phí quá hạn</div>
     </div>
 </div>
+
+<!-- Quick Actions -->
+<div class="table-container" style="margin-top: 30px;">
+    <h3>🎯 Hành động nhanh</h3>
+    <div class="action-buttons" style="padding: 20px;">
+        <a href="{{ url_for('admin.list_users') }}" class="btn btn-primary">👥 Quản lý Users</a>
+        <a href="{{ url_for('admin.list_classrooms') }}" class="btn btn-primary">🏫 Quản lý Lớp học</a>
+        <a href="{{ url_for('admin.list_fees') }}" class="btn btn-primary">💰 Quản lý Học phí</a>
+        <a href="{{ url_for('admin.report_dashboard') }}" class="btn btn-primary">📊 Xem báo cáo</a>
+        <a href="{{ url_for('admin.settings_page') }}" class="btn btn-secondary">⚙️ Cấu hình</a>
+    </div>
+</div>
+
+<!-- Recent Overdue Fees -->
+{% if recent_fees %}
+<div class="table-container" style="margin-top: 20px;">
+    <h3>⚠️ Học phí quá hạn gần đây</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Học sinh</th>
+                <th>Tháng/Năm</th>
+                <th>Số tiền còn lại</th>
+                <th>Hạn thanh toán</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fee in recent_fees %}
+            <tr>
+                <td>{{ fee.student.full_name }}</td>
+                <td>{{ fee.month }}/{{ fee.year }}</td>
+                <td style="color: red; font-weight: bold;">{{ "{:,.0f}".format(fee.remaining_amount) }}đ</td>
+                <td>{{ fee.due_date.strftime('%d/%m/%Y') if fee.due_date else '-' }}</td>
+                <td>
+                    <a href="{{ url_for('admin.fee_detail', fee_id=fee.id) }}" class="btn btn-sm btn-primary">Chi tiết</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% endblock %}

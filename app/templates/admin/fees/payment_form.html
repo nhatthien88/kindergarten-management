@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Ghi nhận thanh toán{% endblock %}
+{% block page_title %}💵 Ghi nhận thanh toán{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h3>Học phí tháng {{ fee.month }}/{{ fee.year }}</h3>
+    <h4>Học sinh: {{ student.full_name }}</h4>
+    
+    <div class="alert alert-info">
+        <strong>Tổng phí:</strong> {{ "{:,.0f}".format(fee.total_fee) }}đ<br>
+        <strong>Đã thanh toán:</strong> {{ "{:,.0f}".format(fee.paid_amount) }}đ<br>
+        <strong>Còn lại:</strong> <span style="color: red; font-weight: bold;">{{ "{:,.0f}".format(remaining) }}đ</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.record_payment', fee_id=fee.id) }}">
+        <div class="form-group">
+            <label for="amount">Số tiền thanh toán (VND) <span style="color: red;">*</span></label>
+            <input type="number" class="form-control" id="amount" name="amount" 
+                   value="{{ remaining }}" min="1" max="{{ remaining }}" required>
+            <small>Số tiền tối đa: {{ "{:,.0f}".format(remaining) }}đ</small>
+        </div>
+
+        <div class="form-group">
+            <label for="method">Phương thức thanh toán <span style="color: red;">*</span></label>
+            <select class="form-control" id="method" name="method" required>
+                <option value="cash">Tiền mặt</option>
+                <option value="bank_transfer">Chuyển khoản ngân hàng</option>
+                <option value="card">Thẻ</option>
+                <option value="momo">MoMo</option>
+                <option value="zalopay">ZaloPay</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="reference_number">Mã giao dịch</label>
+            <input type="text" class="form-control" id="reference_number" name="reference_number" 
+                   placeholder="VD: REF123456 (nếu chuyển khoản)">
+        </div>
+
+        <div class="form-group">
+            <label for="note">Ghi chú</label>
+            <textarea class="form-control" id="note" name="note" 
+                      placeholder="Thông tin bổ sung về thanh toán"></textarea>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">✅ Xác nhận thanh toán</button>
+            <a href="{{ url_for('admin.fee_detail', fee_id=fee.id) }}" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

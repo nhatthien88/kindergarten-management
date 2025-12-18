@@ -1,0 +1,105 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Chi tiết Học phí{% endblock %}
+{% block page_title %}💰 Chi tiết Học phí{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h3>Học phí tháng {{ fee.month }}/{{ fee.year }}</h3>
+    <h4>Học sinh: {{ student.full_name }}</h4>
+    <p><strong>Lớp:</strong> {{ student.classroom.name if student.classroom else '-' }}</p>
+    <p><strong>Hạn thanh toán:</strong> {{ fee.due_date.strftime('%d/%m/%Y') if fee.due_date else '-' }}</p>
+
+    <h4>Chi tiết học phí</h4>
+    <table style="width: 100%; margin-bottom: 20px;">
+        <tr>
+            <th>Học phí cơ bản:</th>
+            <td style="text-align: right;">{{ "{:,.0f}".format(fee.tuition_fee) }}đ</td>
+        </tr>
+        <tr>
+            <th>Tiền ăn:</th>
+            <td style="text-align: right;">{{ "{:,.0f}".format(fee.meal_fee) }}đ</td>
+        </tr>
+        <tr>
+            <th>Phí khác:</th>
+            <td style="text-align: right;">{{ "{:,.0f}".format(fee.extra_fee) }}đ</td>
+        </tr>
+        <tr>
+            <th>Giảm giá:</th>
+            <td style="text-align: right; color: red;">-{{ "{:,.0f}".format(fee.discount) }}đ</td>
+        </tr>
+        <tr style="border-top: 2px solid #333; font-weight: bold; font-size: 1.1em;">
+            <th>Tổng cộng:</th>
+            <td style="text-align: right;">{{ "{:,.0f}".format(fee.total_fee) }}đ</td>
+        </tr>
+        <tr>
+            <th>Đã thanh toán:</th>
+            <td style="text-align: right; color: green;">{{ "{:,.0f}".format(fee.paid_amount) }}đ</td>
+        </tr>
+        <tr style="font-weight: bold; font-size: 1.1em;">
+            <th>Còn lại:</th>
+            <td style="text-align: right; color: {% if remaining > 0 %}red{% else %}green{% endif %};">
+                {{ "{:,.0f}".format(remaining) }}đ
+            </td>
+        </tr>
+    </table>
+
+    <p><strong>Trạng thái:</strong>
+        {% if fee.status.value == 'paid' %}
+            <span class="badge badge-success">Đã thanh toán</span>
+        {% elif fee.status.value == 'pending' %}
+            <span class="badge badge-warning">Chờ thanh toán</span>
+        {% elif fee.status.value == 'overdue' %}
+            <span class="badge badge-danger">Quá hạn</span>
+        {% elif fee.status.value == 'partial' %}
+            <span class="badge badge-info">Thanh toán 1 phần</span>
+        {% endif %}
+    </p>
+
+    <div class="action-buttons" style="margin-bottom: 30px;">
+        {% if remaining > 0 %}
+        <a href="{{ url_for('admin.payment_form', fee_id=fee.id) }}" class="btn btn-success">💵 Thanh toán</a>
+        {% endif %}
+        <a href="{{ url_for('admin.list_fees') }}" class="btn btn-secondary">← Quay lại</a>
+    </div>
+
+    <h4>Lịch sử thanh toán</h4>
+    {% if payments %}
+    <table>
+        <thead>
+            <tr>
+                <th>Ngày thanh toán</th>
+                <th>Số tiền</th>
+                <th>Phương thức</th>
+                <th>Mã giao dịch</th>
+                <th>Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.payment_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ "{:,.0f}".format(payment.amount) }}đ</td>
+                <td>
+                    {% if payment.payment_method.value == 'cash' %}Tiền mặt
+                    {% elif payment.payment_method.value == 'bank_transfer' %}Chuyển khoản
+                    {% elif payment.payment_method.value == 'card' %}Thẻ
+                    {% elif payment.payment_method.value == 'momo' %}MoMo
+                    {% elif payment.payment_method.value == 'zalopay' %}ZaloPay
+                    {% else %}{{ payment.payment_method.value }}
+                    {% endif %}
+                </td>
+                <td>{{ payment.reference_number or '-' }}</td>
+                <td>{{ payment.note or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">💳</div>
+        <div class="empty-state-message">Chưa có thanh toán nào</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

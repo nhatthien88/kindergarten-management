@@ -2,7 +2,8 @@
 from flask import render_template, redirect, url_for, flash, session
 from . import admin_bp
 from app.blueprints.admin.decorators import admin_required
-from app.models import User, UserRole
+from app.blueprints.admin.services import report_service, fee_service
+from app.models import User
 from app.extensions import db
 
 
@@ -14,16 +15,16 @@ def dashboard():
         user_id = session.get('user_id')
         user = db.session.get(User, user_id)
         
-
-        stats = {
-            'total_users': User.query.filter_by(is_active=True).count(),
-            'total_students': 0,
-            'total_teachers': User.query.filter_by(role=UserRole. TEACHER, is_active=True).count(),
-            'total_parents': User.query.filter_by(role=UserRole.PARENT, is_active=True).count(),
-        }
+        # Get stats from report service
+        stats = report_service.get_dashboard_stats()
         
-
-        return render_template('admin/dashboard.html', user=user, stats=stats)
+        # Get recent overdue fees
+        recent_fees = fee_service.get_overdue_fees()[:5]
+        
+        return render_template('admin/dashboard.html', 
+                             user=user, 
+                             stats=stats,
+                             recent_fees=recent_fees)
         
     except Exception as e: 
         flash(f'Lỗi tải dashboard: {str(e)}', 'error')
