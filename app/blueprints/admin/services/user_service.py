@@ -2,7 +2,6 @@
 """Service for user management"""
 from app.extensions import db
 from app.models import User, Teacher, Parent, UserRole
-from sqlalchemy import or_
 
 
 def get_all_users(role=None, status=None):

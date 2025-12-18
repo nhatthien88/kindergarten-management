@@ -5,6 +5,7 @@ from app.models import Fee, Payment, Student, MealCharge, FeeStatus, PaymentMeth
 from app.blueprints.admin.services import setting_service
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+from sqlalchemy import extract
 
 
 def calculate_fee(student_id, month, year):
@@ -17,8 +18,8 @@ def calculate_fee(student_id, month, year):
         # Count meal charges for the month
         meal_count = MealCharge.query.filter(
             MealCharge.student_id == student_id,
-            db.extract('month', MealCharge.charge_date) == month,
-            db.extract('year', MealCharge.charge_date) == year,
+            extract('month', MealCharge.charge_date) == month,
+            extract('year', MealCharge.charge_date) == year,
             MealCharge.has_meal == True
         ).count()
         
