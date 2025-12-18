@@ -66,8 +66,11 @@ def generate_monthly_fees(month, year):
             if not fee_data:
                 continue
             
-            # Create fee
-            due_date = date(year, month, 10) if month <= 12 else date(year + 1, 1, 10)
+            # Create fee - due on 10th of the same month, or next month if December
+            if month == 12:
+                due_date = date(year + 1, 1, 10)
+            else:
+                due_date = date(year, month, 10)
             
             fee = Fee(
                 student_id=student.id,
